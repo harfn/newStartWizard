@@ -8,6 +8,20 @@ command_exists() {
     command -v "$1" &> /dev/null
 }
 
+# Funktion die xfce4-terminal als Standard-Terminalemulator festlegt
+set_xfce4_terminal() {
+    local package_manager=$1
+    if [ "$PACKAGE_MANAGER" = "apt" ]; then
+        sudo update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator /usr/bin/xfce4-terminal 50
+        sudo update-alternatives --set x-terminal-emulator /usr/bin/xfce4-terminal
+    elif [ "$PACKAGE_MANAGER" = "pacman" ]; then
+        sudo ln -sf /usr/bin/xfce4-terminal /usr/local/bin/x-terminal-emulator
+    fi
+    echo "xfce4-terminal is set as the default terminal emulator."
+
+}
+
+
 # Funktion zur Installation der Programme
 install_programs() {
     local package_manager=$1
@@ -40,12 +54,7 @@ fi
 install_programs $PACKAGE_MANAGER "$PROGRAMS"
 
 # Setzen des xfce4-terminal als Standard-Terminalemulator
-if [ "$PACKAGE_MANAGER" = "apt" ]; then
-    sudo update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator /usr/bin/xfce4-terminal 50
-    sudo update-alternatives --set x-terminal-emulator /usr/bin/xfce4-terminal
-elif [ "$PACKAGE_MANAGER" = "pacman" ]; then
-    sudo ln -sf /usr/bin/xfce4-terminal /usr/local/bin/x-terminal-emulator
-fi
+set_xfce4_terminal $PACKAGE_MANAGER
 
 # Installationen überprüfen
 echo "Verifying installations..."
@@ -57,9 +66,16 @@ for cmd in $PROGRAMS; do
     fi
 done
 
-echo "xfce4-terminal is set as the default terminal emulator."
 
-# Optional: Standard-Shell auf zsh setzen
+
+# Standard-Shell auf zsh setzen
 chsh -s $(which zsh)
+
+
+git clone https://github.com/harfn/mydotfiles.git ~/mydotfiles
+stow *
+
+
+
 
 echo "Script completed."
