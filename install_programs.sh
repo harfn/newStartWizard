@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Liste der zu installierenden Programme
-PROGRAMS="xfce4-terminal zsh tmux git stow python3 python3-pip"
+PROGRAMS="wezterm zsh tmux git stow python3 python3-pip"
 
 # Funktion zur Überprüfung, ob ein Befehl existiert
 command_exists() {
@@ -9,15 +9,15 @@ command_exists() {
 }
 
 # Funktion die xfce4-terminal als Standard-Terminalemulator festlegt
-set_xfce4_terminal() {
+set_wezterm() {
     local package_manager=$1
     if [ "$PACKAGE_MANAGER" = "apt" ]; then
-        sudo update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator /usr/bin/xfce4-terminal 50
-        sudo update-alternatives --set x-terminal-emulator /usr/bin/xfce4-terminal
+        sudo update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator /usr/bin/wezterm 50
+        sudo update-alternatives --set x-terminal-emulator /usr/bin/wezterm
     elif [ "$PACKAGE_MANAGER" = "pacman" ]; then
-        sudo ln -sf /usr/bin/xfce4-terminal /usr/local/bin/x-terminal-emulator
+        sudo ln -sf /usr/bin/wezterm /usr/local/bin/x-terminal-emulator
     fi
-    echo "xfce4-terminal is set as the default terminal emulator."
+    echo "wezterm is set as the default terminal emulator."
 
 }
 
@@ -54,7 +54,7 @@ fi
 install_programs $PACKAGE_MANAGER "$PROGRAMS"
 
 # Setzen des xfce4-terminal als Standard-Terminalemulator
-set_xfce4_terminal $PACKAGE_MANAGER
+set_wezterm $PACKAGE_MANAGER
 
 # Installationen überprüfen
 echo "Verifying installations..."
@@ -72,10 +72,19 @@ done
 chsh -s $(which zsh)
 
 
-git clone https://github.com/harfn/mydotfiles.git ~/mydotfiles
-stow *
-
-
+# Dotfiles klonen und stow verwenden
+DOTFILES_DIR="$HOME/mydotfiles"
+if [ -d "$DOTFILES_DIR" ]; then
+    echo "Directory $DOTFILES_DIR already exists. Pulling the latest changes."
+    git -C "$DOTFILES_DIR" pull
+else
+    git clone https://github.com/harfn/mydotfiles.git "$DOTFILES_DIR"
+fi
+echo 'DOTFILES_DIR='$HOME'/mydotfiles'
+cd "$DOTFILES_DIR"
+for dir in */ ; do
+    stow -R "$dir"
+done
 
 
 echo "Script completed."
