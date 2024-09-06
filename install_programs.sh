@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Liste der zu installierenden Programme
-PROGRAMS="wezterm zsh tmux git stow python3 python3-pip"
+PROGRAMS="wezterm zsh tmux git stow python3 python3-pip feh curl lazygit"
 
 # Funktion zur Überprüfung, ob ein Befehl existiert
 command_exists() {
@@ -23,7 +23,7 @@ set_wezterm() {
 
 
 # Funktion zur Installation der Programme
-install_programs() {
+install_programs(){
     local package_manager=$1
     local programs=$2
 
@@ -86,5 +86,6 @@ for dir in */ ; do
     stow -R "$dir"
 done
 
+sudo -v ; curl https://rclone.org/install.sh | sudo bash
 
 echo "Script completed."
