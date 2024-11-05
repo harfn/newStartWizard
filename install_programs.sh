@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Liste der zu installierenden Programme
-PROGRAMS="wezterm zsh tmux git stow python3 python3-pip feh curl lazygit"
+PROGRAMS="wezterm zsh tmux git stow python python-pip feh curl lazygit zoxide fzf"
 
 # Funktion zur Überprüfung, ob ein Befehl existiert
 command_exists() {
@@ -30,7 +30,7 @@ install_programs(){
     if [ "$package_manager" = "apt" ]; then
         sudo apt install -y $programs
     elif [ "$package_manager" = "pacman" ]; then
-        sudo pacman -Syu --noconfirm
+        sudo pacman -Syu #--noconfirm
         
     else
         echo "Unsupported package manager. This script supports apt and pacman."
@@ -86,6 +86,6 @@ for dir in */ ; do
     stow -R "$dir"
 done
 
-sudo -v ; curl https://rclone.org/install.sh | sudo bash
+#sudo -v ; curl https://rclone.org/install.sh | sudo bash
 
 echo "Script completed."
