@@ -1,13 +1,20 @@
 #!/bin/bash
 
-# Variablen für Benutzername und Passwort
-USER_NAME="gixo6309@uol.de"  # Ersetze mit deinem Benutzernamen
+# Variablen für Benutzername und Zertifikat-URL
+
 CERT_URL="https://uol.de/fileadmin/user_upload/itdienste/download/rootcert.crt"
 CERT_PATH="$HOME/.certs/rootcert.crt"
 INTERFACE="wlp4s0"  # Ersetze ggf. mit deiner WLAN-Schnittstelle
+
+# Passwort abfragen
+echo "Gib dein eduroam-Usernamen ein: "
+echo  -n "Username (abcd1234):"
+read  USER_NAME
+echo
+
 # Passwort abfragen
 echo -n "Gib dein eduroam-Passwort ein: "
-read -s PASSWORD
+read  PASSWORD
 echo
 
 # Erstelle das Verzeichnis für das Zertifikat
@@ -22,18 +29,27 @@ if [ $? -ne 0 ]; then
 fi
 echo "Zertifikat erfolgreich heruntergeladen nach $CERT_PATH"
 
-# Erstelle und konfiguriere die eduroam-Verbindung
+# Prüfen, ob eine eduroam-Verbindung bereits existiert und ggf. löschen
+EXISTING_UUIDS=$(nmcli -t -f UUID,NAME connection show | grep "^.*:eduroam$" | cut -d: -f1)
+if [ -n "$EXISTING_UUIDS" ]; then
+    echo "Bestehende eduroam-Verbindung(en) gefunden. Lösche die alte(n) Konfiguration(en)..."
+    for UUID in $EXISTING_UUIDS; do
+        nmcli connection delete uuid "$UUID"
+    done
+fi
+
+# Erstelle und konfiguriere die eduroam-Verbindung direkt mit allen Details
 echo "Richte die eduroam-Verbindung ein..."
-nmcli connection add type wifi ifname "$INTERFACE" con-name eduroam ssid eduroam
-nmcli connection modify eduroam wifi-sec.key-mgmt wpa-eap
-nmcli connection modify eduroam 802-1x.eap ttls
-nmcli connection modify eduroam 802-1x.identity "$USER_NAME"
-nmcli connection modify eduroam 802-1x.anonymous-identity "anonymous@uol.de"
-nmcli connection modify eduroam 802-1x.ca-cert "$CERT_PATH"
-nmcli connection modify eduroam 802-1x.domain-suffix-match "uol.de"
-nmcli connection modify eduroam 802-1x.phase2-auth mschapv2
-nmcli connection modify eduroam 802-1x.password "$PASSWORD"
-nmcli connection modify eduroam connection.autoconnect yes
+nmcli connection add type wifi ifname "$INTERFACE" con-name eduroam ssid eduroam \
+    wifi-sec.key-mgmt wpa-eap \
+    802-1x.eap peap \
+    802-1x.identity "$USER_NAME" \
+    802-1x.anonymous-identity "anonymous@uol.de" \
+    802-1x.ca-cert "$CERT_PATH" \
+    802-1x.domain-suffix-match "uol.de" \
+    802-1x.phase2-auth mschapv2 \
+    802-1x.password "$PASSWORD" \
+    connection.autoconnect yes
 
 # Versuche, eine Verbindung herzustellen
 echo "Verbinde mit eduroam..."
