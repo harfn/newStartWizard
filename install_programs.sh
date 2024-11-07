@@ -19,6 +19,8 @@ PROGRAMS=(
     "taskwarrior-tui:taskwarrior-tui" # TUI für Taskwarrior
     "r:R"                       # Programmiersprache und Umgebung für statistische Berechnungen
     "base-devel:gcc"            # Basis-Entwicklungswerkzeuge, erforderlich für NVIM und viele Softwarekompilierungen
+    "nodejs:node"             # nodejs, erforderlich für NVIM Masson
+    "npm:npm"                   # erforderlich für nodejs und NVIM Masson
     "neovim:nvim"               # Neovim, eine erweiterbare und verbesserte Version des Vim-Editors für effiziente Textbearbeitung
 )
 
