@@ -22,6 +22,7 @@ PROGRAMS=(
     "nodejs:node"             # nodejs, erforderlich für NVIM Masson
     "npm:npm"                   # erforderlich für nodejs und NVIM Masson
     "neovim:nvim"               # Neovim, eine erweiterbare und verbesserte Version des Vim-Editors für effiziente Textbearbeitung
+    "polybar:polybar"
 )
 
 # Funktion zur Überprüfung, ob ein Befehl existiert
